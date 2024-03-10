@@ -16,7 +16,7 @@ section .bss
     num resd 1 ;reserve
 
 section .data
-    var1 db 0
+    var1 times 4     db 0
 
 section .text
 
@@ -77,25 +77,18 @@ if_end:
     JMP seq
        
 end:
-    PRINT_DEC 8, RAX
+    ;We know that last number in Sequence is 1 which should be
+    ;located in the last nibble of RAX
+    PRINT_DEC 1, AL 
+    NEWLINE
     
-    NEWLINE
-    NEWLINE
     PRINT_STRING "Do you want to continue (Y/N)? "
-    
-    ;TODO: Fix user prompt
-    GET_CHAR var1
-    PRINT_CHAR var1
-    
-    CMP byte RAX, 'Y'
+    GET_STRING [var1], 2 ; Clear enter from first INPUT
+    GET_STRING [var1], 2 ; Read Char 
+   
+    CMP byte [var1+0], 'Y'
     JE main
     
     NOP
     XOR RAX, RAX
     RET
-
-
-    
-    
-    
-    

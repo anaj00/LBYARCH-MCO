@@ -16,14 +16,15 @@ section .bss
     num resd 1 ;reserve
 
 section .data
-    var1 times 4     db 0
+    var1 times 4 db 0
 
 section .text
 
-global main
+global main 
 
 main:
     mov rbp, rsp; for correct debugging
+    
     PRINT_STRING "Welcome to Collatz Conjecture Sequence Generator"
     NEWLINE
     NEWLINE
@@ -34,10 +35,16 @@ main:
     
     NEWLINE
     
+    ;Check if invalid
+    MOV RDX, [num]
+    SHL RDX, 1
+    JE invalid_input
+    
     ;Check if negative
     CMP qword [num], 0
     JL negative_input
-    
+
+preseq:    
     ;Clear RDX before division
     XOR RDX, RDX
     
@@ -61,11 +68,15 @@ seq:
 negative_input:
     PRINT_STRING "Error: negative number input"
     NEWLINE
+    NEWLINE
+    JMP invalid_end
 
 invalid_input:
-    PRINT_STRING "Invalid"
-    JMP end
-    
+    PRINT_STRING "Error: Invalid input"
+    NEWLINE
+    NEWLINE
+    JMP invalid_end
+
 if_even: 
     SHR RAX, 1
     JMP if_end
@@ -81,14 +92,28 @@ end:
     ;located in the last nibble of RAX
     PRINT_DEC 1, AL 
     NEWLINE
+    NEWLINE
     
     PRINT_STRING "Do you want to continue (Y/N)? "
     GET_STRING [var1], 2 ; Clear enter from first INPUT
     GET_STRING [var1], 2 ; Read Char 
-   
+    
     CMP byte [var1+0], 'Y'
+    NEWLINE
     JE main
     
     NOP
-    XOR RAX, RAX
+    RET
+
+invalid_end:
+    PRINT_STRING "Do you want to continue (Y/N)? "
+    GET_STRING [var1], 2 ; Clear enter from first INPUT
+    GET_STRING [var1], 2 ; Read Char 
+    
+    CMP byte [var1+0], 'Y'
+    NEWLINE
+    CLEAR_INPUT_BUFFER
+    JE main
+       
+    NOP
     RET
